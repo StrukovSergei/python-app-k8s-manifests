@@ -1,18 +1,18 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: python-app
+  name: weather-app
   labels:
-    app: python-app
+    app: weather-app
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: python-app
+      app: weather-app
   template:
     metadata:
       labels:
-        app: python-app
+        app: weather-app
     spec:
       containers:
         - name: weather-app
