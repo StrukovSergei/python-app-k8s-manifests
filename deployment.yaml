@@ -1,0 +1,23 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: python-app
+  labels:
+    app: python-app
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: python-app
+  template:
+    metadata:
+      labels:
+        app: python-app
+    spec:
+      containers:
+        - name: weather-app
+          image: "strukovsergei/test-rep:latest"
+          ports:
+            - containerPort: 8000
+      imagePullSecrets:
+        - name: regcred
