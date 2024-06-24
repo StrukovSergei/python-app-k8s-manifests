@@ -1,0 +1,30 @@
+services:
+  gunicorn:
+    deploy:
+      mode: replicated
+      replicas: 2
+    restart: always
+    build: .
+    networks:
+      - weather_net
+    environment:
+      - BG_COLOR=#ADD8E6  # Light blue color
+
+  docker-nginx:
+    container_name: WeatherApp_nginx
+    restart: always
+    image: nginx:latest
+    ports:
+      - 9090:9090
+    volumes:
+      - ./nginx/default.conf:/etc/nginx/conf.d/default.conf
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf
+    networks:
+      - weather_net
+    depends_on:
+      - gunicorn
+  
+networks:
+  weather_net:
+    name: WeatherApp_network
+    driver: bridge

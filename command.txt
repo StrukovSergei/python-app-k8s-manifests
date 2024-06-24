@@ -1,0 +1,5 @@
+docker run -d --network weather_net --name docker-nginx -p 9090:9090 -v /home/sergei/Desktop/devops/docker/ws1/ex25/nginx/default.conf:/etc/nginx/conf.d/default.conf nginx
+
+docker run -d -it --network weather_net -p 8000:8000 --name WeatherApp_gunicorn weatherapp
+
+docker network create weather_net

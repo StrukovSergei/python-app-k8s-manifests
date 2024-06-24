@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Weather App</title>
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+<style>
+  html, body {
+      height: 100%;
+      margin: 0;
+      padding: 0;
+  }
+  
+  body {
+      background-image: url('https://img.freepik.com/free-vector/gorgeous-clouds-background-with-blue-sky-design_1017-25501.jpg');
+      background-size: cover;
+      background-repeat: no-repeat;
+      background-position: center;
+  }
+  .card1 {
+    height: 280px;
+    width: 220px;
+    background: rgba( 255, 255, 255, 0.1 );box-shadow: 0 8px 32px 0 rgba( 31, 38, 135, 0.37 );backdrop-filter: blur( 2px );-webkit-backdrop-filter: blur( 2px );border-radius: 10px;  }
+  .card1:hover {
+    background-color: #4d99e7;
+    transition: 0.7s;
+    border-color: transparent;
+  }
+  
+  .container {
+      padding: 20px;
+  }
+
+  .gaphelper {
+    gap: 11vh;
+    padding-right: 13vh;
+  }
+</style>
+</head>
+<body>
+<section class="" >
+  <div class=" h-100">
+    <div class="row d-flex justify-content-center align-items-center h-100">
+        <h3 class="mb-4 pb-2 fw-normal d-flex justify-content-center align-items-center pt-3">Check the weather forecast</h3>
+        <form method="POST" class="mb-3 w-50" >
+            <div class="input-group rounded mb-3 ">
+              <input type="search" name="location" id="location" class="form-control rounded " placeholder="City or Country" aria-label="Search" aria-describedby="search-addon" required>
+              <button type="submit" class="input-group-text border-0 fw-bold bg-transparent" id="search-addon">Check!</button>
+            </div>
+        </form>
+        {% if weather_data %}
+        <h4 class="mb-1 sfw-normal d-flex justify-content-center align-items-center pb-4 text-capitalize">{{ filtered_location }}</h4>
+        <p class="mb-1 sfw-normal d-flex justify-content-center align-items-center pb-4">Current temperature: <strong>{{ (weather_data.currentConditions.temp - 32) // (1.8) }}°C</strong></p>
+        <div class="row row-cols-1 row-cols-md-7 gaphelper d-flex justify-content-center align-items-center ">
+        {% for i in range(7) %}
+        <div class="col-md-1 g-4">
+          <div class="card card1 shadow-0 ">
+            <div class="card-body card1 p-3">
+              <h5 class="d-flex justify-content-center align-items-center pb-4"> <strong>{{days[i]}}</strong></h5>
+              <p>Date: <strong>{{weather_data.days[i].datetime}}</strong></p>
+              <p >Day: <strong>{{ (weather_data.days[i].tempmax - 32) // (1.8) }}°C</strong>, Night: <strong>{{ (weather_data.days[i].tempmin - 32) // (1.8) }}°C</strong></p>
+              <p>Humidity: <strong>{{weather_data.days[i].humidity}}%</strong></p>
+              <h6 class="d-flex justify-content-center align-items-center pt-4"> <strong>{{weather_data.days[i].conditions}}</strong></h6>
+            </div>
+          </div>
+        </div>
+        {% endfor %}
+        </div>
+        {% elif wrong_input %}
+        <h5 class="mb-4 pb-2 fw-normal d-flex justify-content-center align-items-center pt-3">Wrong input</h5>
+        {% endif %}
+    </div>
+  </div>
+</section>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+</body>
+</html>
