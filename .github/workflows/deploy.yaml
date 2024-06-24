@@ -14,12 +14,9 @@ jobs:
       uses: actions/checkout@v2
 
     - name: Set up Kubernetes
-      uses: azure/setup-kubectl@v1
-      with:
-        version: 'latest'
-
-    - name: Update Kubernetes Manifests
       run: |
+        echo "${{ secrets.KUBECONFIG }}" > $HOME/.kube/config
         kubectl apply -f deployment.yaml
         kubectl apply -f service.yaml
-
+      env:
+        KUBECONFIG: ${{ secrets.KUBECONFIG }}
