@@ -28,7 +28,7 @@ jobs:
     # Build Docker image
     - name: Build Docker image
       run: |
-        docker build -t strukovsergei/weatherapp:latest .
+        docker compose build -t strukovsergei/weatherapp:latest .
         docker tag strukovsergei/weatherapp:latest strukovsergei/weatherapp:${{ github.sha }}
 
     # Push Docker image to DockerHub
