@@ -16,8 +16,6 @@ jobs:
     - name: Set up Kubernetes
       run: |
         mkdir -p $HOME/.kube
-        echo "${{ secrets.KUBECONFIG }}" > $HOME/.kube/config
-    - name: Apply Kubernetes manifests
-      run: |
+        cp ./kubeconfig.yaml $HOME/.kube/config
         kubectl apply -f deployment.yaml
         kubectl apply -f service.yaml
