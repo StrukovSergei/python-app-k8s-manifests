@@ -81,9 +81,28 @@ jobs:
             chmod +x argocd-linux-amd64
             sudo mv argocd-linux-amd64 /usr/local/bin/argocd
       - run:
+          name: Deploy ArgoCD
+          command: |
+            kubectl create namespace argocd
+            kubectl apply -n argocd -f https://raw.githubusercontent.com/argoproj/argo-cd/v2.8.4/manifests/install.yaml
+      - run:
+          name: Get ArgoCD Server Address
+          command: |
+            sleep 60 # Wait for the load balancer to be created
+            ARGOCD_SERVER=$(kubectl -n argocd get svc argocd-server -o jsonpath='{.status.loadBalancer.ingress[0].hostname}')
+            echo $ARGOCD_SERVER
+            echo "export ARGOCD_SERVER=$ARGOCD_SERVER" >> $BASH_ENV
+      - run:
+          name: Login to ArgoCD
+          command: |
+            PASS=$(kubectl -n argocd get secret argocd-initial-admin-secret -o jsonpath="{.data.password}" | base64 -d; echo)
+            source $BASH_ENV
+            argocd login $ARGOCD_SERVER --username admin --password $PASS --insecure
+      - run:
           name: Deploy to EKS
           command: |
             aws eks --region eu-west-3 update-kubeconfig --name eks-prod
+            source $BASH_ENV
             argocd app create weather-app --repo https://github.com/StrukovSergei/weatherapp-k8s --path . --dest-server https://kubernetes.default.svc --dest-namespace default
             argocd app sync weather-app
 
