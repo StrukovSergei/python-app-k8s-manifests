@@ -60,7 +60,7 @@ jobs:
           command: |
             cd tf
             terraform init
-            terraform destroy
+            terraform destroy -auto-approve
             # terraform plan -out=tfplan
             # terraform apply -auto-approve tfplan
 
