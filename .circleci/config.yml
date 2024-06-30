@@ -17,7 +17,7 @@ jobs:
       - run:
           name: Test Docker Image
           command: |
-            docker run --rm weather-app python -m unittest discover -s tests
+            docker run --rm weather-app python -m unittest discover -s site-reachable
             # Send test report to Discord
             curl -X POST -H "Content-Type: application/json" -d '{"content": "Test report"}' DISCORD_WEBHOOK_URL
       - run:
