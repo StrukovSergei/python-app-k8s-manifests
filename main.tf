@@ -1,8 +1,8 @@
 terraform {
   backend "s3" {
-    bucket = "test-terraform13"
+    bucket = "test-terraform12"
     key    = "path/to/my/key"
-    region = "il-central-1"
+    region = "eu-west-3"
   }
 }
 
