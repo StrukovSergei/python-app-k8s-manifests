@@ -3,6 +3,7 @@ version: 2.1
 orbs:
   terraform: circleci/terraform@3.1
   go: circleci/go@1.11.0
+  aws-cli: circleci/aws-cli@4.0
 
 executors:
   docker-executor:
@@ -66,6 +67,7 @@ jobs:
     executor: docker-executor
     steps:
       - checkout
+      - aws-cli/setup
       - run:
           name: Install kubectl
           command: |
