@@ -12,7 +12,7 @@ func TestTerraformEks(t *testing.T) {
     t.Parallel()
 
     terraformOptions := &terraform.Options{
-        TerraformDir: "../",
+        TerraformDir: "../tf",
         Vars: map[string]interface{}{
             // Add any variables you want to override here
         },

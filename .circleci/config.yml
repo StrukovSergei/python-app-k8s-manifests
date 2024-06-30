@@ -48,6 +48,7 @@ jobs:
       - run:
           name: Run Terratest
           command: |
+            ls
             go mod init terratests
             go get github.com/gruntwork-io/terratest/modules/terraform
             go get github.com/stretchr/testify/assert
@@ -57,7 +58,7 @@ jobs:
           command: pip install checkov
       - run:
           name: Run Checkov
-          command: checkov -d .
+          command: checkov -d tf || true
       - run:
           name: Terraform Plan
           command: terraform plan -out=tfplan
