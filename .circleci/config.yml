@@ -1,37 +1,97 @@
-# This config was automatically generated from your source code
-# Stacks detected: cicd:github-actions:.github/workflows,deps:python:.
 version: 2.1
-orbs:
-  python: circleci/python@2
-jobs:
-  test-python:
-    # Install dependencies and run tests
+
+executors:
+  docker-executor:
     docker:
-      - image: cimg/python:3.8-node
+      - image: circleci/python:3.8
+
+jobs:
+  build:
+    executor: docker-executor
     steps:
       - checkout
-      - python/install-packages
+      - setup_remote_docker
       - run:
-          name: Run tests
-          command: pytest --junitxml=junit.xml || ((($? == 5)) && echo 'Did not find any tests to run.')
-      - store_test_results:
-          path: junit.xml
-  deploy:
-    # This is an example deploy job, not actually used by the workflow
-    docker:
-      - image: cimg/base:stable
+          name: Build Docker Image
+          command: docker build -t weather-app .
+      - run:
+          name: Test Docker Image
+          command: |
+            docker run --rm weather-app python -m unittest discover -s tests
+            # Send test report to Discord
+            curl -X POST -H "Content-Type: application/json" -d '{"content": "Test report"}' DISCORD_WEBHOOK_URL
+      - run:
+          name: Upload to GitLab Container Registry
+          command: |
+            docker login registry.gitlab.com -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD
+            docker tag weather-app registry.gitlab.com/strukov.sergei.999/weatherapp
+            docker push registry.gitlab.com/strukov.sergei.999/weatherapp
+
+  terraform:
+    executor: docker-executor
     steps:
-      # Replace this with steps to deploy to users
+      - checkout
       - run:
-          name: deploy
-          command: '#e.g. ./deploy.sh'
+          name: Install Terraform
+          command: |
+            curl -o /tmp/terraform.zip https://releases.hashicorp.com/terraform/1.0.0/terraform_1.0.0_linux_amd64.zip
+            unzip /tmp/terraform.zip -d /usr/local/bin/
       - run:
-          name: found github actions config
-          command: ':'
+          name: Terraform Init
+          command: terraform init
+      - run:
+          name: Terraform Validate
+          command: terraform validate
+      - run:
+          name: Terraform Plan
+          command: terraform plan -out=tfplan
+      - run:
+          name: Terraform Apply
+          command: terraform apply -auto-approve tfplan
+      - run:
+          name: Install Terratest
+          command: go get github.com/gruntwork-io/terratest/modules/terraform
+      - run:
+          name: Run Terratest
+          command: go test -v test/terratest
+      - run:
+          name: Install Checkov
+          command: pip install checkov
+      - run:
+          name: Run Checkov
+          command: checkov -d .
+
+  deploy:
+    executor: docker-executor
+    steps:
+      - checkout
+      - run:
+          name: Install kubectl
+          command: |
+            curl -LO "https://storage.googleapis.com/kubernetes-release/release/$(curl -s https://storage.googleapis.com/kubernetes-release/release/stable.txt)/bin/linux/amd64/kubectl"
+            chmod +x ./kubectl
+            mv ./kubectl /usr/local/bin/kubectl
+      - run:
+          name: Install ArgoCD
+          command: |
+            curl -sSL -o argocd-linux-amd64 https://github.com/argoproj/argo-cd/releases/latest/download/argocd-linux-amd64
+            chmod +x argocd-linux-amd64
+            mv argocd-linux-amd64 /usr/local/bin/argocd
+      - run:
+          name: Deploy to EKS
+          command: |
+            aws eks --region us-west-2 update-kubeconfig --name your-cluster-name
+            argocd app create weather-app --repo https://github.com/yourusername/weather-app.git --path . --dest-server https://kubernetes.default.svc --dest-namespace default
+            argocd app sync weather-app
+
 workflows:
-  build-and-test:
+  version: 2
+  build-deploy:
     jobs:
-      - test-python
-    # - deploy:
-    #     requires:
-    #       - test-python
+      - build
+      - terraform:
+          requires:
+            - build
+      - deploy:
+          requires:
+            - terraform
