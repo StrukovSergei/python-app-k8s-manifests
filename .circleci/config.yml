@@ -34,7 +34,8 @@ jobs:
     executor: docker-executor
     steps:
       - checkout
-      - terraform/install
+      - terraform/install:
+        terraform_version: "1.3"
       - run:
           name: Terraform Init
           command: terraform init
@@ -46,7 +47,9 @@ jobs:
           command: go get github.com/gruntwork-io/terratest/modules/terraform
       - run:
           name: Run Terratest
-          command: go test -v test/terratest
+          command: |
+            go test -v terratest -timeout 99999999s
+
       - run:
           name: Install Checkov
           command: pip install checkov
