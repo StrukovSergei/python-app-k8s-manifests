@@ -2,6 +2,7 @@ version: 2.1
 
 orbs:
   terraform: circleci/terraform@3.1
+  go: circleci/go@1.11.0
 
 executors:
   docker-executor:
@@ -42,14 +43,15 @@ jobs:
       - run:
           name: Terraform Validate
           command: terraform validate
-      - run:
-          name: Install Terratest
-          command: go get github.com/gruntwork-io/terratest/modules/terraform
+      - go/install:
+          version: "1.18"
       - run:
           name: Run Terratest
           command: |
+            go mod init terratests
+            go get github.com/gruntwork-io/terratest/modules/terraform
+            go get github.com/stretchr/testify/assert
             go test -v terratest -timeout 99999999s
-
       - run:
           name: Install Checkov
           command: pip install checkov
