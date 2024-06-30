@@ -37,12 +37,6 @@ jobs:
       - checkout
       - terraform/install:
           terraform_version: "1.3.10"
-      - run:
-          name: Terraform Init
-          command: terraform init
-      - run:
-          name: Terraform Validate
-          command: terraform validate
       - go/install:
           version: "1.18"
       - run:
@@ -59,6 +53,14 @@ jobs:
       - run:
           name: Run Checkov
           command: checkov -d tf || true
+      - run:
+          name: Terraform Init
+          command: |
+            cd tf
+            terraform init
+      - run:
+          name: Terraform Validate
+          command: terraform validate
       - run:
           name: Terraform Plan
           command: terraform plan -out=tfplan
