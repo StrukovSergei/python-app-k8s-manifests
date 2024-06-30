@@ -28,26 +28,20 @@ jobs:
             docker push registry.gitlab.com/strukov.sergei.999/weatherapp
 
   terraform:
+    orbs:
+      terraform: circleci/terraform@3.2.1
     executor: docker-executor
     steps:
       - checkout
-      - run:
-          name: Install Terraform
-          command: |
-            curl -o /tmp/terraform.zip https://releases.hashicorp.com/terraform/1.0.0/terraform_1.0.0_linux_amd64.zip
-            unzip /tmp/terraform.zip -d /usr/local/bin/
+      
+      - terraform/install:
+
       - run:
           name: Terraform Init
           command: terraform init
       - run:
           name: Terraform Validate
           command: terraform validate
-      - run:
-          name: Terraform Plan
-          command: terraform plan -out=tfplan
-      - run:
-          name: Terraform Apply
-          command: terraform apply -auto-approve tfplan
       - run:
           name: Install Terratest
           command: go get github.com/gruntwork-io/terratest/modules/terraform
@@ -60,6 +54,12 @@ jobs:
       - run:
           name: Run Checkov
           command: checkov -d .
+      - run:
+          name: Terraform Plan
+          command: terraform plan -out=tfplan
+      - run:
+          name: Terraform Apply
+          command: terraform apply -auto-approve tfplan
 
   deploy:
     executor: docker-executor
