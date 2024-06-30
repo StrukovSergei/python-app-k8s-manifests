@@ -59,8 +59,8 @@ jobs:
           name: Terraform 
           command: |
             cd tf
+            terraform init
             terraform destroy
-            # terraform init
             # terraform plan -out=tfplan
             # terraform apply -auto-approve tfplan
 
