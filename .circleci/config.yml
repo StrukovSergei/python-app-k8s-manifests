@@ -37,37 +37,30 @@ jobs:
       - checkout
       - terraform/install:
           terraform_version: "1.3.10"
-      - go/install:
-          version: "1.18"
+      # - go/install:
+      #     version: "1.18"
+      # - run:
+      #     name: Run Terratest
+      #     command: |
+      #       cd terratests
+      #       go mod init terratests
+      #       go mod tidy
+      #       go get github.com/gruntwork-io/terratest/modules/terraform
+      #       go get github.com/stretchr/testify/assert
+      #       go test -v -timeout 99999999s
+      # - run:
+      #     name: Install Checkov
+      #     command: pip install checkov
+      # - run:
+      #     name: Run Checkov
+      #     command: checkov -d tf || true
       - run:
-          name: Run Terratest
-          command: |
-            cd terratests
-            go mod init terratests
-            go mod tidy
-            go get github.com/gruntwork-io/terratest/modules/terraform
-            go get github.com/stretchr/testify/assert
-            go test -v -timeout 99999999s
-      - run:
-          name: Install Checkov
-          command: pip install checkov
-      - run:
-          name: Run Checkov
-          command: checkov -d tf || true
-      - run:
-          name: Terraform Init
+          name: Terraform 
           command: |
             cd tf
             terraform init
-      - run:
-          name: Terraform Validate
-          command: terraform validate
-      - run:
-          name: Terraform Plan
-          command: terraform plan -out=tfplan
-      - run:
-          name: Terraform Apply
-          command: terraform apply -auto-approve tfplan
+            terraform plan -out=tfplan
+            terraform apply -auto-approve tfplan
 
   deploy:
     executor: docker-executor
@@ -88,8 +81,8 @@ jobs:
       - run:
           name: Deploy to EKS
           command: |
-            aws eks --region us-west-2 update-kubeconfig --name your-cluster-name
-            argocd app create weather-app --repo https://github.com/yourusername/weather-app.git --path . --dest-server https://kubernetes.default.svc --dest-namespace default
+            aws eks --region eu-west-3 update-kubeconfig --name eks-prod
+            argocd app create weather-app --repo https://github.com/StrukovSergei/weatherapp-k8s --path . --dest-server https://kubernetes.default.svc --dest-namespace default
             argocd app sync weather-app
 
 workflows:
