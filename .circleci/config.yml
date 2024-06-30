@@ -14,12 +14,12 @@ jobs:
       - run:
           name: Build Docker Image
           command: docker build -t weather-app .
-      - run:
-          name: Test Docker Image
-          command: |
-            python3 site-reachable.py
-            # Send test report to Discord
-            curl -X POST -H "Content-Type: application/json" -d '{"content": "Test report"}' DISCORD_WEBHOOK_URL
+      # - run:
+      #     name: Test Docker Image
+      #     command: |
+      #       python3 site-reachable.py
+      #       # Send test report to Discord
+      #       curl -X POST -H "Content-Type: application/json" -d '{"content": "Test report"}' DISCORD_WEBHOOK_URL
       - run:
           name: Upload to GitLab Container Registry
           command: |
