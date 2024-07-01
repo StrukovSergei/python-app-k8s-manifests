@@ -1,0 +1,18 @@
+git clone https://github.com/asobti/kube-monkey.git
+cd kube-monkey
+
+kubectl create namespace kube-monkey
+helm install kube-monkey ./helm/kube-monkey --namespace kube-monkey
+
+kubectl get pods --namespace kube-monkey
+
+nano helm/kube-monkey/values.yaml
+
+helm upgrade kube-monkey ./helm/kube-monkey --namespace kube-monkey
+
+kubectl annotate deployment <your-deployment-name> kube-monkey/enabled="true" -n <your-namespace>
+
+kubectl logs -f -n kube-monkey $(kubectl get pods -n kube-monkey -l app=kube-monkey -o jsonpath="{.items[0].metadata.name}")
+
+helm uninstall kube-monkey --namespace kube-monkey
+kubectl delete namespace kube-monkey

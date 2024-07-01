@@ -60,9 +60,9 @@ jobs:
           command: |
             cd tf
             terraform init
-            # terraform destroy -auto-approve
-            terraform plan -out=tfplan
-            terraform apply -auto-approve tfplan
+            terraform destroy -auto-approve
+            # terraform plan -out=tfplan
+            # terraform apply -auto-approve tfplan
 
   deploy:
     executor: docker-executor
